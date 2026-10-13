@@ -63,6 +63,17 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
+  const deleteAccount = async () => {
+    setLoading(true);
+    try {
+      await authService.deleteMyAccount();
+      setUser(null);
+      setToken(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const isAdmin = user && (user.role === 'ROLE_ADMIN' || user.role === 'ADMIN');
   const isParticipant = user && (user.role === 'ROLE_PARTICIPANT' || user.role === 'PARTICIPANT');
   const isAuthenticated = !!token && !!user;
@@ -79,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        deleteAccount,
       }}
     >
       {children}

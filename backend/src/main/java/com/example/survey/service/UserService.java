@@ -1,10 +1,14 @@
 package com.example.survey.service;
 
 import com.example.survey.dto.UserSummaryDto;
+import com.example.survey.entity.PollVote;
+import com.example.survey.entity.Response;
 import com.example.survey.entity.Role;
 import com.example.survey.entity.User;
 import com.example.survey.exception.BadRequestException;
 import com.example.survey.exception.ResourceNotFoundException;
+import com.example.survey.repository.PollVoteRepository;
+import com.example.survey.repository.ResponseRepository;
 import com.example.survey.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,9 +24,15 @@ public class UserService {
     private String adminEmail;
 
     private final UserRepository userRepository;
+    private final ResponseRepository responseRepository;
+    private final PollVoteRepository pollVoteRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       ResponseRepository responseRepository,
+                       PollVoteRepository pollVoteRepository) {
         this.userRepository = userRepository;
+        this.responseRepository = responseRepository;
+        this.pollVoteRepository = pollVoteRepository;
     }
 
     public List<UserSummaryDto> getAllUsers() {
@@ -69,6 +79,18 @@ public class UserService {
 
         if (u.getEmail().equalsIgnoreCase(adminEmail.trim().toLowerCase())) {
             throw new BadRequestException("The primary administrator account cannot be deleted.");
+        }
+
+        // 1. Delete all survey responses submitted by this user (cascades to answers)
+        List<Response> userResponses = responseRepository.findByUserIdOrderBySubmittedAtDesc(u.getId());
+        if (!userResponses.isEmpty()) {
+            responseRepository.deleteAll(userResponses);
+        }
+
+        // 2. Delete all poll votes submitted by this user
+        List<PollVote> userVotes = pollVoteRepository.findByUserIdOrderByVotedAtDesc(u.getId());
+        if (!userVotes.isEmpty()) {
+            pollVoteRepository.deleteAll(userVotes);
         }
 
         userRepository.delete(u);

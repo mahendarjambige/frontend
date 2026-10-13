@@ -97,8 +97,11 @@ const Navbar = () => {
             </>
           ) : (
             <div className="navbar-auth-links">
-              <Link to="/login" className="btn-nav-login">
-                Login
+              <Link to="/login?role=user" className="btn-nav-login">
+                User Sign-In
+              </Link>
+              <Link to="/login?role=admin" className="btn-nav-login" style={{ color: '#6d28d9', fontWeight: 600 }}>
+                🛡️ Admin Sign-In
               </Link>
               <Link to="/register" className="btn-nav-register">
                 Register

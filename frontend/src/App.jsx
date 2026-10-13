@@ -31,12 +31,14 @@ import AdminSurveyResults from './pages/admin/AdminSurveyResults';
 import AdminPollResults from './pages/admin/AdminPollResults';
 import ManageUsers from './pages/admin/ManageUsers';
 
-// Home Redirect Helper
-const HomeRedirect = () => {
+// Public-Only Route Helper: redirects authenticated users directly to their dashboard
+const PublicOnlyRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
   if (loading) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/dashboard" replace />;
+  if (isAuthenticated) {
+    return <Navigate to={isAdmin ? '/admin/dashboard' : '/dashboard'} replace />;
+  }
+  return children;
 };
 
 function App() {
@@ -50,8 +52,23 @@ function App() {
               {/* Public Landing Route */}
               <Route path="/" element={<Home />} />
 
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
+              {/* Public Auth Routes (Only accessible when logged out) */}
+              <Route
+                path="/login"
+                element={
+                  <PublicOnlyRoute>
+                    <Login />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route
+                path="/admin/login"
+                element={
+                  <PublicOnlyRoute>
+                    <Navigate to="/login?role=admin" replace />
+                  </PublicOnlyRoute>
+                }
+              />
               <Route path="/register" element={<Register />} />
 
               {/* Participant Routes */}

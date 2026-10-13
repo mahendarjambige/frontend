@@ -1,0 +1,25 @@
+# Maven build directory
+backend/target/
+**/target/
+
+# Node modules & build
+frontend/node_modules/
+**/node_modules/
+frontend/dist/
+**/dist/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+scratch/

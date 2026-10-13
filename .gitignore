@@ -28,4 +28,5 @@ scratch/
 .env
 .env.*
 *.env
+!frontend/.env.production
 
